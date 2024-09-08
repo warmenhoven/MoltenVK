@@ -551,6 +551,10 @@ id<MTLComputePipelineState> MVKCommandResourceFactory::newCmdClearColorImageMTLC
 id<MTLComputePipelineState> MVKCommandResourceFactory::newCmdResolveColorImageMTLComputePipelineState(MVKFormatType type,
 																									  MVKVulkanAPIDeviceObject* owner,
 																									  bool isTextureArray) {
+#if MVK_TVOS
+    if (isTextureArray && !mvkOSVersionIsAtLeast(14))
+        isTextureArray = false;
+#endif
 	const char* funcName;
 	switch (type) {
 		case kMVKFormatColorHalf:
