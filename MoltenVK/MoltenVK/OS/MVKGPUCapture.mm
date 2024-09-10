@@ -60,8 +60,8 @@ void MVKGPUCaptureScope::endScope() {
 
 void MVKGPUCaptureScope::makeDefault() {
 	_isDefault = true;
-	if (_mtlCaptureScope) {
-		[MTLCaptureManager sharedCaptureManager].defaultCaptureScope = _mtlCaptureScope;
+	if (_mtlCaptureScope && ![MTLCaptureManager sharedCaptureManager].defaultCaptureScope) {
+        [MTLCaptureManager sharedCaptureManager].defaultCaptureScope = _mtlCaptureScope;
 	}
 }
 
@@ -86,6 +86,9 @@ MVKGPUCaptureScope::MVKGPUCaptureScope(MVKQueue* mvkQueue) {
 }
 
 MVKGPUCaptureScope::~MVKGPUCaptureScope() {
+    if ([MTLCaptureManager sharedCaptureManager].defaultCaptureScope == _mtlCaptureScope)
+        [MTLCaptureManager sharedCaptureManager].defaultCaptureScope = nil;
+    _isDefault = false;
 	[_mtlCaptureScope release];
 	[_mtlQueue release];
 }
