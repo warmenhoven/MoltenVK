@@ -1,0 +1,41 @@
+name: Build MoltenVK v1.3.0
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-moltenvk:
+    runs-on: macos-13
+    
+    steps:
+    - name: Select Xcode 15.4
+      run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+    
+    - name: Verify Xcode version
+      run: xcodebuild -version
+    
+    - name: Checkout MoltenVK at v1.3.0
+      uses: actions/checkout@v4
+      with:
+        repository: KhronosGroup/MoltenVK
+        ref: v1.3.0
+        submodules: recursive
+    
+    - name: Fetch Dependencies
+      run: ./fetchDependencies --tvos
+    
+    - name: Build MoltenVK
+      run: make tvos
+    
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: moltenvk-v1.3.0-macos
+        path: |
+          Package/Latest/MoltenVK/
+          Package/Latest/MoltenVKShaderConverter/
+        retention-days: 30
